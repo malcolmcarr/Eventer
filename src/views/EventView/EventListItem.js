@@ -29,9 +29,9 @@ class EventListItem extends Component {
               <Segment secondary>
                 <List horizontal>
                   {
-                    attendees.map(att => {
+                    attendees ? attendees.map(att => {
                       return <EventListAttendee key={att.id} attendee={att} />
-                    })
+                    }) : null
                   }
                 </List>
               </Segment>
