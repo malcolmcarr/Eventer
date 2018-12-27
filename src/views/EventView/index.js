@@ -9,7 +9,7 @@ const events = [
   {
     id: '1',
     title: 'Trip to Tower of London',
-    date: '2018-03-27T11:00:00+00:00',
+    date: '2018-03-27',
     category: 'culture',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
@@ -33,7 +33,7 @@ const events = [
   {
     id: '2',
     title: 'Trip to Punch and Judy Pub',
-    date: '2018-03-28T14:00:00+00:00',
+    date: '2018-03-28',
     category: 'drinks',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
@@ -61,9 +61,14 @@ class EventDashboard extends Component {
     super(props);
     this.state = {
       events,
-      isActive: false
+      isActive: false,
+      selectedEvent: null
     };
   }
+
+  toggleForm = () => {
+    this.setState({ isActive: !this.state.isActive, selectedEvent: null });
+  };
 
   onCreateEvent = event => {
     event.id = cuid();
@@ -74,20 +79,53 @@ class EventDashboard extends Component {
     });
   };
 
+  onUpdateEvent = event => {
+    this.setState({
+      event: this.state.events.map(previousEvent => {
+        if (event.id === previousEvent.id) {
+          return { event, ...this.state.events };
+        } else {
+          return event;
+        }
+      }),
+      isActive: false,
+      selectedEvent: null
+    });
+  };
+
+  onDeleteEvent = id => {
+    this.setState({
+      events: this.state.events.filter(event => event.id !== id)
+    });
+  };
+
+  onSelectEvent = event => () => {
+    this.setState({
+      selectedEvent: event,
+      isActive: true
+    });
+  };
+
   render() {
-    const { events, isActive } = this.state;
+    const { events, selectedEvent } = this.state;
     return (
       <Grid>
         <Grid.Column width={10}>
-          <EventList events={events} />
+          <EventList
+            onDeleteEvent={this.onDeleteEvent}
+            onSelectEvent={this.onSelectEvent}
+            events={events}
+          />
         </Grid.Column>
         <Grid.Column width={6}>
-          <Button
-            positive
-            content='Create Event'
-            onClick={() => this.setState({ isActive: !isActive })}
-          />
-          {this.state.isActive ? <EventForm onCreateEvent={this.onCreateEvent} /> : null}
+          <Button positive content='Create Event' onClick={this.toggleForm} />
+          {this.state.isActive ? (
+            <EventForm
+              selectedEvent={selectedEvent}
+              onCreateEvent={this.onCreateEvent}
+              onUpdateEvent={this.onUpdateEvent}
+            />
+          ) : null}
         </Grid.Column>
       </Grid>
     );

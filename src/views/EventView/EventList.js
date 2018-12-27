@@ -4,7 +4,14 @@ import EventListItem from './EventListItem';
 class EventList extends Component {
   renderEvents = () => {
     return this.props.events.map(event => {
-      return <EventListItem key={event.id} event={event} />;
+      return (
+        <EventListItem
+          onDeleteEvent={this.props.onDeleteEvent}
+          onSelectEvent={this.props.onSelectEvent}
+          key={event.id}
+          event={event}
+        />
+      );
     });
   };
 
@@ -12,7 +19,7 @@ class EventList extends Component {
     return (
       <div>
         <h1>Events</h1>
-        {this.renderEvents()}
+        {this.props.events.length ? this.renderEvents() : <p style={{"fontStyle": "italic"}}>No Events yet</p>}
       </div>
     );
   }

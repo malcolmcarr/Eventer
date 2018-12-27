@@ -1,19 +1,38 @@
 import React, { Component } from 'react';
 import { Button, Form, Segment } from 'semantic-ui-react';
 
+const DEFAULT_EVENT = {
+  title: '',
+  date: '',
+  city: '',
+  venue: '',
+  hostedBy: ''
+};
+
 class EventForm extends Component {
   state = {
-    event: {
-      title: '',
-      date: '',
-      city: '',
-      venue: '',
-      hostedBy: ''
-    }
+    event: DEFAULT_EVENT
   };
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (
+      nextProps.selectedEvent &&
+      nextProps.selectedEvent !== prevState.event
+    ) {
+      return { event: nextProps.selectedEvent };
+    }
+    return null;
+  }
+
   onFormSubmit = e => {
     e.preventDefault();
-    this.props.onCreateEvent(this.state.event);
+
+    // Check if an event is being updated or newly created
+    if (this.state.event.id) {
+      this.props.onUpdateEvent(this.state.event);
+    } else {
+      this.props.onCreateEvent(this.state.event);
+    }
   };
 
   onInputChange = e => {
