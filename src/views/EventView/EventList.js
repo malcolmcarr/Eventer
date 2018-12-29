@@ -6,9 +6,8 @@ class EventList extends Component {
     return this.props.events.map(event => {
       return (
         <EventListItem
-          onDeleteEvent={this.props.onDeleteEvent}
-          onSelectEvent={this.props.onSelectEvent}
           key={event.id}
+          onDeleteEvent={this.props.onDeleteEvent}
           event={event}
         />
       );
@@ -19,7 +18,11 @@ class EventList extends Component {
     return (
       <div>
         <h1>Events</h1>
-        {this.props.events.length ? this.renderEvents() : <p style={{"fontStyle": "italic"}}>No Events yet</p>}
+        {this.props.events.length ? (
+          this.renderEvents()
+        ) : (
+          <p style={{ fontStyle: 'italic' }}>No Events yet</p>
+        )}
       </div>
     );
   }

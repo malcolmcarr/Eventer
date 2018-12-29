@@ -26,8 +26,10 @@ class App extends Component {
               <Container className='main'>
                 <Switch>
                   <Route path='/events/create' component={EventForm} />
-                  <Route path='/events' component={EventView} />
-                  <Route path='/event/:id' component={EventDetailView} />
+                  <Route exact path='/events' component={EventView} />
+                  <Route exact path='/events/:id' component={EventDetailView} />
+                  <Route path='/events/:id/manage' component=
+                  {EventForm} />
                   <Route path='/people' component={PeopleView} />
                   <Route path='/profile:id' component={ProfileView} />
                   <Route path='/settings' component={SettingsView} />
