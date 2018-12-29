@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EventDetail = () => {
+const EventDetailView = () => {
   return (
     <div>
       <h1>Detail Page</h1>
@@ -8,4 +8,4 @@ const EventDetail = () => {
   );
 };
 
-export default EventDetail;
+export default EventDetailView;

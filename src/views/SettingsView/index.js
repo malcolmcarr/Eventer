@@ -1,11 +1,30 @@
 import React from 'react';
+import { Grid } from 'semantic-ui-react';
 
-const SettingsDashboard = () => {
+import SettingsNav from './SettingsNav';
+import { Switch, Route, Redirect } from 'react-router-dom';
+import BasicsPage from './BasicsPage';
+import AboutPage from './AboutPage';
+import AccountPage from './AccountPage';
+import PhotosPage from './PhotosPage';
+
+const SettingsView = () => {
   return (
-    <div>
-      <h1>Dashboard</h1>
-    </div>
+    <Grid>
+      <Grid.Column width={12}>
+        <Switch>
+          <Redirect exact from='/settings' to='/settings/basics' />
+          <Route path='/settings/basics' component={BasicsPage} />
+          <Route path='/settings/about' component={AboutPage} />
+          <Route path='/settings/photos' component={PhotosPage} />
+          <Route path='/settings/account' component={AccountPage} />      
+        </Switch>
+      </Grid.Column>
+      <Grid.Column width={4}>
+        <SettingsNav />
+      </Grid.Column>
+    </Grid>
   );
 };
 
-export default SettingsDashboard;
+export default SettingsView;

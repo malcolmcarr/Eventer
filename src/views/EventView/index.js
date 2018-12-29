@@ -56,7 +56,7 @@ const events = [
   }
 ];
 
-class EventDashboard extends Component {
+class EventView extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -132,4 +132,4 @@ class EventDashboard extends Component {
   }
 }
 
-export default EventDashboard;
+export default EventView;
