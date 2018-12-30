@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 
 // Component to fix React Router issue with not rendering top of page after a Link is clicked
