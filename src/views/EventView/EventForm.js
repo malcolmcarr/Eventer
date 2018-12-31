@@ -1,15 +1,19 @@
+/*global google*/
 import React, { Component } from 'react';
 import { Button, Grid, Header, Form, Segment } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { reduxForm, Field } from 'redux-form';
 import cuid from 'cuid';
 import { combineValidators, isRequired } from 'revalidate';
+import Script from 'react-load-script';
 
 import { createEvent, updateEvent } from '../../actions';
 import TextInput from '../../components/form/TextInput';
 import TextArea from '../../components/form/TextArea';
 import SelectInput from '../../components/form/SelectInput';
 import DateInput from '../../components/form/DateInput';
+import PlaceInput from '../../components/form/PlaceInput';
+import keys from '../../credentials/keys';
 
 const actions = {
   createEvent,
@@ -47,9 +51,32 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 class EventForm extends Component {
+  state = {
+    cityLocation: null,
+    venueLocation: null,
+    scriptLoaded: false
+  };
+
+  onCitySelect = suggestion => {
+    if (suggestion) {
+      // Fix to make sure selected value is updated in store
+      this.props.change('city', suggestion.description);
+      suggestion && this.setState({ cityLocation: suggestion.location });
+    }
+  };
+
+  onVenueSelect = suggestion => {
+    if (suggestion) {
+      // Fix to make sure selected value is updated in store
+      this.props.change('venue', suggestion.description); 
+      suggestion && this.setState({ venueLocation: suggestion.location });
+    }
+  };
+
   onFormSubmit = values => {
-    // Convert object to string for for React
-    values.date = values.date.toString();
+    // Convert object to string for for React, if provided
+    if (values.date) values.date = values.date.toString();
+    values.venueLocation = this.state.venueLocation;
     const { initialValues } = this.props;
     // Check if an event is being updated or newly created
     if (initialValues.id) {
@@ -67,10 +94,21 @@ class EventForm extends Component {
     }
   };
 
+  onScriptLoad = () => {
+    this.setState({ scriptLoaded: true });
+  };
+
   render() {
     const { invalid, submitting, pristine } = this.props;
+    const { cityLocation } = this.state;
     return (
       <Grid>
+        <Script
+          url={`https://maps.googleapis.com/maps/api/js?key=${
+            keys.googleAPIKey
+          }&libraries=places`}
+          onLoad={this.onScriptLoad}
+        />
         <Grid.Column width={10}>
           <Segment>
             <Header sub color='teal' content='Event details' />
@@ -99,15 +137,23 @@ class EventForm extends Component {
               <Field
                 name='city'
                 type='text'
-                component={TextInput}
+                component={PlaceInput}
+                types={['(cities)']}
                 placeholder='What city is this taking place in?'
+                onSuggestSelect={this.onCitySelect}
               />
-              <Field
-                name='venue'
-                type='text'
-                component={TextInput}
-                placeholder='What venue will your event be held at?'
-              />
+              {this.state.scriptLoaded && (
+                <Field
+                  name='venue'
+                  type='text'
+                  component={PlaceInput}
+                  types={['establishment']}
+                  location={new google.maps.LatLng(cityLocation)}
+                  radius='1000'
+                  placeholder='What venue will your event be held at?'
+                  onSuggestSelect={this.onVenueSelect}
+                />
+              )}
               <Field
                 name='date'
                 type='text'

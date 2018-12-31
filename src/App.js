@@ -10,6 +10,7 @@ import PeopleView from './views/PeopleView';
 import EventDetailView from './views/EventDetailView';
 import EventForm from './views/EventView/EventForm';
 import HomeView from './views/HomeView';
+import test from './components/test';
 
 class App extends Component {
   render() {
@@ -33,6 +34,7 @@ class App extends Component {
                   <Route path='/people' component={PeopleView} />
                   <Route path='/profile:id' component={ProfileView} />
                   <Route path='/settings' component={SettingsView} />
+                  <Route path='/test' component={test} />
                 </Switch>
               </Container>
             </div>
