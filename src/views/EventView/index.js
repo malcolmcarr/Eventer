@@ -3,7 +3,7 @@ import { Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
 import EventList from './EventList';
-import { createEvent, deleteEvent, updateEvent } from '../../actions';
+import { createEvent, deleteEvent, updateEvent } from '../../actions/eventActions';
 
 const actions = {
   createEvent,

@@ -7,7 +7,7 @@ import cuid from 'cuid';
 import { combineValidators, isRequired } from 'revalidate';
 import Script from 'react-load-script';
 
-import { createEvent, updateEvent } from '../../actions';
+import { createEvent, updateEvent } from '../../actions/eventActions';
 import TextInput from '../../components/form/TextInput';
 import TextArea from '../../components/form/TextArea';
 import SelectInput from '../../components/form/SelectInput';

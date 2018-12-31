@@ -11,11 +11,13 @@ import EventDetailView from './views/EventDetailView';
 import EventForm from './views/EventView/EventForm';
 import HomeView from './views/HomeView';
 import test from './components/test';
+import ModalManager from './components/modals/ModalManager';
 
 class App extends Component {
   render() {
     return (
       <div>
+        <ModalManager />
         <Switch>
           <Route exact path='/' component={HomeView} />
         </Switch>
