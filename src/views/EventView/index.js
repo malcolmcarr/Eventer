@@ -3,52 +3,36 @@ import { Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
 import EventList from './EventList';
-import { createEvent, deleteEvent, updateEvent } from '../../actions/eventActions';
+import { deleteEvent } from '../../actions/eventActions';
+import LoadingIcon from '../../components/LoadingIcon';
 
-const actions = {
-  createEvent,
-  deleteEvent,
-  updateEvent
-};
+const actions = { deleteEvent };
 
 const mapStateToProps = state => ({
-  events: state.events
+  events: state.events,
+  loading: state.async.loading
 });
 
 class EventView extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isActive: false,
-      selectedEvent: null
-    };
-  }
-
   onDeleteEvent = id => {
     this.props.deleteEvent(id);
   };
 
-  onSelectEvent = event => () => {
-    this.setState({
-      selectedEvent: event,
-      isActive: true
-    });
-  };
-
   render() {
-    const { events } = this.props;
+    const { events, loading } = this.props;
+
+    if (loading) return <LoadingIcon />;
 
     return (
       <Grid>
         <Grid.Column width={10}>
           <EventList
             onDeleteEvent={this.onDeleteEvent}
+            inverted={false}
             events={events}
           />
         </Grid.Column>
-        <Grid.Column width={6}>
-
-        </Grid.Column>
+        <Grid.Column width={6} />
       </Grid>
     );
   }

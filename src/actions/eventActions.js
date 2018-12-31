@@ -1,4 +1,18 @@
-import { CREATE_EVENT, DELETE_EVENT, UPDATE_EVENT } from '../constants';
+import {
+  FETCH_EVENTS,
+  CREATE_EVENT,
+  DELETE_EVENT,
+  UPDATE_EVENT
+} from '../constants';
+import {
+  asyncActionBegin,
+  asyncActionComplete,
+  asyncActionError
+} from './asyncActions';
+
+export const fetchEvents = events => {
+  return { type: FETCH_EVENTS, payload: { events } };
+};
 
 export const createEvent = event => {
   return {
@@ -6,7 +20,7 @@ export const createEvent = event => {
     payload: {
       event
     }
-  }
+  };
 };
 
 export const deleteEvent = id => {
@@ -15,7 +29,7 @@ export const deleteEvent = id => {
     payload: {
       id
     }
-  }
+  };
 };
 
 export const updateEvent = event => {
@@ -24,5 +38,19 @@ export const updateEvent = event => {
     payload: {
       event
     }
-  }
+  };
+};
+
+export const loadEvents = () => {
+  return async dispatch => {
+    try {
+      dispatch(asyncActionBegin());
+      let events; // fetch data
+      dispatch(fetchEvents(events));
+      dispatch(asyncActionComplete());
+    } catch (err) {
+      console.log(err);
+      dispatch(asyncActionError());
+    }
+  };
 };
