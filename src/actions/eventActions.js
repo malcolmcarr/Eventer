@@ -1,4 +1,4 @@
-import { toastr } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr';
 import {
   FETCH_EVENTS,
   CREATE_EVENT,
@@ -26,7 +26,7 @@ export const createEvent = event => {
       });
       toastr.success('Success', 'Event was successfully created!');
     } catch (err) {
-      toastr.error('Oops', 'Something went wrong while creating your event.')
+      toastr.error('Oops', 'Something went wrong while creating your event.');
     }
   };
 };
@@ -42,7 +42,7 @@ export const deleteEvent = id => {
       });
       toastr.success('Success!', 'Event was successfully removed.');
     } catch (err) {
-      toastr.error('Oops!', 'Something went wrong while removing your event.')
+      toastr.error('Oops!', 'Something went wrong while removing your event.');
     }
   };
 };
@@ -58,7 +58,7 @@ export const updateEvent = event => {
       });
       toastr.success('Success!', 'Event was successfully updated.');
     } catch (err) {
-      toastr.error('Oops!', 'Something went wrong while updating your event.')
+      toastr.error('Oops!', 'Something went wrong while updating your event.');
     }
   };
 };
@@ -67,11 +67,11 @@ export const loadEvents = () => {
   return async dispatch => {
     try {
       dispatch(asyncActionBegin());
-      let events; // fetch data
+      let events = []; // fetch data
       dispatch(fetchEvents(events));
       dispatch(asyncActionComplete());
     } catch (err) {
-      console.log(err);
+      toastr.error('Oops!', 'Could not load events');
       dispatch(asyncActionError());
     }
   };

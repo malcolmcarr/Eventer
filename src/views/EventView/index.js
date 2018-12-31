@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import EventList from './EventList';
 import { deleteEvent } from '../../actions/eventActions';
 import LoadingIcon from '../../components/LoadingIcon';
+import EventActivity from './EventActivity';
 
 const actions = { deleteEvent };
 
@@ -32,7 +33,9 @@ class EventView extends Component {
             events={events}
           />
         </Grid.Column>
-        <Grid.Column width={6} />
+        <Grid.Column width={6}>
+          <EventActivity />
+        </Grid.Column>
       </Grid>
     );
   }

@@ -22,7 +22,6 @@ class PlaceInput extends Component {
       placeholder,
       options,
       meta: { touched, error },
-      ...rest
     } = this.props;
     return (
       <Form.Field error={touched && !!error} width={width}>
@@ -35,6 +34,7 @@ class PlaceInput extends Component {
         {this.state.scriptLoaded && (
           <Geosuggest
             {...input}
+            options={options}
             placeholder={placeholder}
             onSuggestSelect={this.props.onSuggestSelect}
             onSelect={onSelect}
