@@ -9,6 +9,10 @@ class EventDetailInfo extends Component {
     showMap: false
   };
 
+  componentWillUnmount() {
+    this.setState({ showMap: false });
+  }
+
   showMapToggle = () => {
     this.setState(prevState => ({
       showMap: !prevState.showMap
@@ -17,6 +21,7 @@ class EventDetailInfo extends Component {
 
   render() {
     const { event } = this.props;
+
     return (
       <div>
         <Segment.Group>
@@ -36,7 +41,7 @@ class EventDetailInfo extends Component {
                 <Icon name='calendar' size='large' color='teal' />
               </Grid.Column>
               <Grid.Column width={15}>
-                <span>{format(event.date, 'dddd Do MMMM')} at{' '} {format(event.date, 'h:mm a')}</span>
+                <span>{format(event.date.toDate(), 'dddd Do MMMM')} at{' '} {format(event.date.toDate(), 'h:mm a')}</span>
               </Grid.Column>
             </Grid>
           </Segment>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
 
 import EventList from './EventList';
 import { deleteEvent } from '../../actions/eventActions';
@@ -10,7 +11,7 @@ import EventActivity from './EventActivity';
 const actions = { deleteEvent };
 
 const mapStateToProps = state => ({
-  events: state.events,
+  events: state.firestore.ordered.events,
   loading: state.async.loading
 });
 
@@ -44,4 +45,4 @@ class EventView extends Component {
 export default connect(
   mapStateToProps,
   actions
-)(EventView);
+)(firestoreConnect([{ collection: 'events' }])(EventView));

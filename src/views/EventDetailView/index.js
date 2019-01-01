@@ -19,6 +19,8 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const EventDetailView = ({ event }) => {
+  if (!event.venue) return <h1>Nothing is here :(</h1>
+
   return (
     <Grid>
       <Grid.Column width={10}>

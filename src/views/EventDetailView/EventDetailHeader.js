@@ -33,7 +33,7 @@ const EventDetailHeader = ({ event }) => {
                     style={{ color: 'white' }}
               
                   />
-                  <p>{format(event.date, 'dddd Do MMMM')} at{' '} {format(event.date, 'h:mm a')}</p>
+                  <p>{format(event.date.toDate(), 'dddd Do MMMM')} at{' '} {format(event.date.toDate(), 'h:mm a')}</p>
                   <p>
                     Hosted by <strong>{event.hostedBy}</strong>
                   </p>

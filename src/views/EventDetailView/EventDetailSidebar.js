@@ -2,7 +2,7 @@ import React from 'react';
 import { Item, Label, List, Segment } from 'semantic-ui-react';
 
 const displayAttendees = attendees =>
-  attendees.map(attendee => (
+  attendees && attendees.map(attendee => (
     <Segment attached>
       <List relaxed divided>
         <Item key={attendee.id} style={{ position: 'relative' }}>
@@ -26,6 +26,16 @@ const displayAttendees = attendees =>
     </Segment>
   ));
 
+  const displayNumAttending = attendees => {
+    if (!attendees || !attendees.length) {
+      return '0 people are going';
+    } else if (attendees && attendees.length === 1) {
+      return '1 person is going';
+    } else {
+      return `${attendees.length} people are going`;
+    }
+  }
+
 const EventDetailSidebar = ({ attendees }) => {
   return (
     <div>
@@ -37,8 +47,7 @@ const EventDetailSidebar = ({ attendees }) => {
         inverted
         color='teal'
       >
-        {attendees && attendees.length}{' '}
-        {attendees && attendees.length === 1 ? 'person is' : 'people are'} going
+        { displayNumAttending(attendees) }
       </Segment>
       {displayAttendees(attendees)}
     </div>
