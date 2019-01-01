@@ -11,7 +11,7 @@ class LoginModal extends Component {
   render() {
     return (
       <Modal size='mini' open={true} onClose={this.props.closeModal}>
-        <Modal.Header>Login to Ventually</Modal.Header>
+        <Modal.Header>Sign In to Ventually</Modal.Header>
         <Modal.Content>
           <Modal.Description>
             <LoginForm />

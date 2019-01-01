@@ -10,7 +10,8 @@ import firebase from '../config/firebase';
 const rrConfig = {
   userProfile: 'users',
   attachAuthIsReady: true,
-  useFirestoreForProfile: true
+  useFirestoreForProfile: true,
+  updateProfileOnLogin: false
 };
 
 export const configureStore = state => {

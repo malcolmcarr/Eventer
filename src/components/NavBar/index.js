@@ -7,22 +7,20 @@ import { withFirebase } from 'react-redux-firebase';
 import SignedOutMenu from './SignedOutMenu';
 import SignedInMenu from './SignedInMenu';
 import { openModal } from '../../actions/modalActions';
-import { signOut } from '../../actions/authActions';
 
 const actions = {
   openModal,
-  signOut
 };
 
-const mapStateToProps = state => ({ auth: state.firebase.auth });
+const mapStateToProps = state => ({ auth: state.firebase.auth, profile: state.firebase.profile });
 
 class NavBar extends Component {
 
-  onSignIn = () => {
+  openSignIn = () => {
     this.props.openModal('LoginModal', {});
   };
 
-  onRegister = () => {
+  openRegister = () => {
     this.props.openModal('RegisterModal');
   };
 
@@ -32,7 +30,7 @@ class NavBar extends Component {
   };
 
   render() {
-    const { auth } = this.props;
+    const { auth, profile } = this.props;
     const authenticated = auth.isLoaded && !auth.isEmpty;
     return (
       <div>
@@ -59,9 +57,9 @@ class NavBar extends Component {
               </Menu.Item>
             )}
             {authenticated ? (
-              <SignedInMenu onSignOut={this.onSignOut} auth={auth} />
+              <SignedInMenu onSignOut={this.onSignOut} profile={profile} />
             ) : (
-              <SignedOutMenu onRegister={this.onRegister} onSignIn={this.onSignIn} />
+              <SignedOutMenu openRegister={this.openRegister} openSignIn={this.openSignIn} />
             )}
           </Container>
         </Menu>

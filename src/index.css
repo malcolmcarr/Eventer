@@ -173,3 +173,7 @@ body {
 .geosuggest__item__matched-text {
   font-weight: bold;
 }
+
+.ui.modal {
+  top: 20%!important;
+}

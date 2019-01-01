@@ -13,15 +13,15 @@ const mapStateToProps = state => ({
 });
 
 const ModalManager = ({ openModal }) => {
-  let renderModal;
+  let renderedModal;
 
   if (openModal) {
     const { modalType, modalProps } = openModal;
     const ModalComponent = modalIndex[modalType];
 
-    renderModal = <ModalComponent {...modalProps} />;
+    renderedModal = <ModalComponent {...modalProps} />;
   }
-  return <span>{renderModal}</span>;
+  return <span>{renderedModal}</span>;
 };
 
 export default connect(mapStateToProps)(ModalManager);
