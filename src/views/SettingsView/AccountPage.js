@@ -15,7 +15,6 @@ import {
   isRequired,
   composeValidators
 } from 'revalidate';
-import { Link } from 'react-router-dom';
 
 import TextInput from '../../components/form/TextInput';
 

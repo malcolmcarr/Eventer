@@ -38,6 +38,7 @@ class PlaceInput extends Component {
             placeholder={placeholder}
             onSuggestSelect={this.props.onSuggestSelect}
             onSelect={onSelect}
+            autoComplete="off"
             // {...rest}
           />
         )}
