@@ -34,7 +34,7 @@ class App extends Component {
                   <Route path='/events/:id/manage' component=
                   {EventForm} />
                   <Route path='/people' component={PeopleView} />
-                  <Route path='/profile:id' component={ProfileView} />
+                  <Route path='/profile/:id' component={ProfileView} />
                   <Route path='/settings' component={SettingsView} />
                   <Route path='/test' component={test} />
                 </Switch>
