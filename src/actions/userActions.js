@@ -121,7 +121,7 @@ export const setUserGoing = event => {
     const newAttendee = {
       going: true,
       joinDate: Date.now(),
-      photoURL,
+      photoURL: photoURL || '/assets/user.png',
       displayName: user.displayName,
       host: false
     };
@@ -148,14 +148,6 @@ export const setUserNotGoing = event => {
   return async (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const user = firestore.auth().currentUser;
-    const photoURL = getState().firebase.profile.photoURL;
-    const attendee = {
-      going: false,
-      joinDate: Date.now(),
-      photoURL,
-      displayName: user.displayName,
-      host: false
-    };
 
     try {
       await firestore.update(`events/${event.id}`, {

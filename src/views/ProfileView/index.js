@@ -13,24 +13,35 @@ import {
 } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { differenceInYears, format } from 'date-fns';
-import { firestoreConnect } from 'react-redux-firebase';
+import { firestoreConnect, isEmpty } from 'react-redux-firebase';
 import { compose } from 'redux';
 import { Link } from 'react-router-dom';
+import LazyLoad from 'react-lazyload';
 
-const mapStateToProps = state => ({
-  profile: state.firebase.profile,
-  auth: state.firebase.auth,
-  photos: state.firestore.ordered.photos
-});
+import { userProfileQuery } from '../../queries/userQueries';
+import LoadingIcon from '../../components/LoadingIcon';
 
-const query = ({ auth }) => [
-  {
-    collection: 'users',
-    doc: auth.uid,
-    subcollections: [{ collection: 'photos' }],
-    storeAs: 'photos'
+const mapStateToProps = (state, ownProps) => {
+  let userUID = null;
+  let profile = {};
+
+  if (ownProps.match.params.id === state.firebase.auth.uid) {
+    profile = state.firebase.profile;
+  } else {
+    profile =
+      !isEmpty(state.firestore.ordered.profile) &&
+      state.firestore.ordered.profile[0];
+    userUID = ownProps.match.params.id;
   }
-];
+
+  return {
+    profile,
+    userUID,
+    auth: state.firebase.auth,
+    photos: state.firestore.ordered.photos,
+    requesting: state.firestore.status.requesting
+  };
+};
 
 class ProfileView extends Component {
   getAge = DOB => {
@@ -39,7 +50,11 @@ class ProfileView extends Component {
   };
 
   render() {
-    const { photos, profile } = this.props;
+    const { photos, profile, auth, match, requesting } = this.props;
+    const isCurrentUser = auth.uid === match.params.id;
+    const loading = Object.values(requesting).some(a => a === true);
+
+    if (loading) return <LoadingIcon inverted />
 
     return (
       <Grid>
@@ -76,7 +91,12 @@ class ProfileView extends Component {
                 </p>
                 <p>
                   Member Since:{' '}
-                  <strong>{format(profile.createdAt && profile.createdAt.toDate(), 'MM/YYYY')}</strong>
+                  <strong>
+                    {format(
+                      profile.createdAt && profile.createdAt.toDate(),
+                      'MM/YYYY'
+                    )}
+                  </strong>
                 </p>
                 <p>{profile.description || 'No description'}</p>
               </Grid.Column>
@@ -98,7 +118,18 @@ class ProfileView extends Component {
         </Grid.Column>
         <Grid.Column width={4}>
           <Segment>
-            <Button as={Link} to='/settings/about' color='teal' fluid basic content='Edit Profile' />
+            {isCurrentUser ? (
+              <Button
+                as={Link}
+                to='/settings/about'
+                color='teal'
+                fluid
+                basic
+                content='Edit Profile'
+              />
+            ) : (
+              <Button color='orange' fluid basic content='Follow User' />
+            )}
           </Segment>
         </Grid.Column>
 
@@ -106,7 +137,16 @@ class ProfileView extends Component {
           <Segment attached>
             <Header icon='image' content='Photos' />
             <Image.Group size='small'>
-              {photos && photos.map(photo => <Image src={photo.url} />)}
+              {photos &&
+                photos.map(photo => (
+                  <LazyLoad
+                    key={photo.id}
+                    height={150}
+                    placeholder={<Image src='/assets/user.png' />}
+                  >
+                    <Image src={photo.url} />
+                  </LazyLoad>
+                ))}
             </Image.Group>
           </Segment>
         </Grid.Column>
@@ -151,5 +191,5 @@ class ProfileView extends Component {
 
 export default compose(
   connect(mapStateToProps),
-  firestoreConnect(auth => query(auth))
+  firestoreConnect((auth, userUID) => userProfileQuery(auth, userUID))
 )(ProfileView);
