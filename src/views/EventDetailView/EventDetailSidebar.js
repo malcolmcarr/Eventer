@@ -3,10 +3,11 @@ import { Item, Label, List, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
 const displayAttendees = (attendees, event) =>
-  attendees && attendees.map((attendee, i) => (
-    <Segment attached>
+  attendees &&
+  attendees.map(attendee => (
+    <Segment attached key={attendee.id}>
       <List relaxed divided>
-        <Item key={i} style={{ position: 'relative' }}>
+        <Item style={{ position: 'relative' }}>
           {attendee.displayName === event.hostedBy && (
             <Label
               style={{ position: 'absolute' }}
@@ -27,15 +28,15 @@ const displayAttendees = (attendees, event) =>
     </Segment>
   ));
 
-  const displayNumAttending = attendees => {
-    if (!attendees || !attendees.length) {
-      return '0 people are going';
-    } else if (attendees && attendees.length === 1) {
-      return '1 person is going';
-    } else {
-      return `${attendees.length} people are going`;
-    }
+const displayNumAttending = attendees => {
+  if (!attendees || !attendees.length) {
+    return '0 people are going';
+  } else if (attendees && attendees.length === 1) {
+    return '1 person is going';
+  } else {
+    return `${attendees.length} people are going`;
   }
+};
 
 const EventDetailSidebar = ({ attendees, event }) => {
   return (

@@ -2,7 +2,6 @@ import React from 'react';
 import { Image, Item, Button, Segment, Header } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
-import { setUserGoing } from '../../actions/userActions';
 
 const eventImageStyle = {
   filter: 'brightness(30%)'

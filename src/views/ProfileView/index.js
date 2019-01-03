@@ -8,7 +8,6 @@ import {
   Image,
   Item,
   List,
-  Menu,
   Segment,
   Tab
 } from 'semantic-ui-react';

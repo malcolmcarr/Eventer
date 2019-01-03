@@ -112,3 +112,26 @@ export const getEventsForDashboard = lastEvent => {
     }
   };
 };
+
+export const addEventComment = (eventId, values, parentId) => {
+  return async (dispatch, getState, { getFirebase }) => {
+    const firebase = getFirebase();
+    const profile = getState().firebase.profile;
+    const user = firebase.auth().currentUser;
+
+    let newComment = {
+      parentId,
+      text : values.comment,
+      displayName: profile.displayName,
+      photoURL: profile.photoURL || '/assets/user.png',
+      uid: user.uid,
+      date: Date.now()
+    };
+
+    try {
+      await firebase.push(`event_chat/${eventId}`, newComment);
+    } catch (error) {
+      console.error(error);
+      toastr.error('Oops!', 'Could not post your comment');
+    }
+  }}
