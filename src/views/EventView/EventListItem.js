@@ -25,7 +25,7 @@ class EventListItem extends Component {
         <Segment>
           <Item.Group>
             <Item>
-              <Item.Image size='tiny' circular src={hostPhotoURL} />
+              <Item.Image size='tiny' circular src={hostPhotoURL || '/assets/user.png'} />
               <Item.Content>
                 <Item.Header as={Link} to={`/events/${id}`}>{title}</Item.Header>
                 <Item.Description>
@@ -45,8 +45,8 @@ class EventListItem extends Component {
         </Segment>
         <Segment>
           <span>
-            <Icon name='clock' /> {format(date, 'dddd Do MMMM')} at{' '}
-            {format(date, 'h:mm a')} |
+            <Icon name='clock' /> {date && format(date.toDate(), 'dddd Do MMMM')} at{' '}
+            {date && format(date.toDate(), 'h:mm a')} |
             <Icon name='marker' /> {venue}
           </span>
         </Segment>

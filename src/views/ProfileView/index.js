@@ -9,7 +9,8 @@ import {
   Item,
   List,
   Menu,
-  Segment
+  Segment,
+  Tab
 } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { differenceInYears, format } from 'date-fns';
@@ -20,9 +21,17 @@ import LazyLoad from 'react-lazyload';
 
 import { userProfileQuery } from '../../queries/userQueries';
 import LoadingIcon from '../../components/LoadingIcon';
+import { getUserEvents } from '../../actions/userActions';
+
+const panes = [
+  { menuItem: 'All Events', pane: { key: 'allEvents' } },
+  { menuItem: 'Past Events', pane: { key: 'pastEvents' } },
+  { menuItem: 'Future Events', pane: { key: 'futureEvents' } },
+  { menuItem: 'Hosted Events', pane: { key: 'hostedEvents' } }
+];
 
 const mapStateToProps = (state, ownProps) => {
-  let userUID = null;
+  let userUid = null;
   let profile = {};
 
   if (ownProps.match.params.id === state.firebase.auth.uid) {
@@ -31,30 +40,54 @@ const mapStateToProps = (state, ownProps) => {
     profile =
       !isEmpty(state.firestore.ordered.profile) &&
       state.firestore.ordered.profile[0];
-    userUID = ownProps.match.params.id;
   }
+  userUid = ownProps.match.params.id;
 
   return {
     profile,
-    userUID,
+    userUid,
     auth: state.firebase.auth,
     photos: state.firestore.ordered.photos,
-    requesting: state.firestore.status.requesting
+    requesting: state.firestore.status.requesting,
+    eventsLoading: state.async.loading,
+    events: state.events
   };
 };
 
+const actions = {
+  getUserEvents
+};
+
 class ProfileView extends Component {
+  
+  async componentDidMount() {
+    await this.props.getUserEvents(this.props.userUid);
+  }
+  
   getAge = DOB => {
-    if (!DOB) return 'unspecified age';
+    if (!DOB) return 'Unspecified age';
     return differenceInYears(Date.now(), new Date(DOB));
   };
 
+  changeTab = async (e, data) => {
+    let index = data.activeIndex === 0 ? undefined : data.activeIndex;
+    await this.props.getUserEvents(this.props.userUid, index);
+  }
+
   render() {
-    const { photos, profile, auth, match, requesting } = this.props;
+    const {
+      photos,
+      profile,
+      auth,
+      match,
+      requesting,
+      events,
+      eventsLoading
+    } = this.props;
     const isCurrentUser = auth.uid === match.params.id;
     const loading = Object.values(requesting).some(a => a === true);
 
-    if (loading) return <LoadingIcon inverted />
+    if (loading) return <LoadingIcon inverted />;
 
     return (
       <Grid>
@@ -62,16 +95,21 @@ class ProfileView extends Component {
           <Segment>
             <Item.Group>
               <Item>
-                <Item.Image avatar size='small' src={profile.photoURL} />
+                <Item.Image
+                  avatar
+                  size='small'
+                  src={profile.photoURL || '../../../public/assets/user.png'}
+                />
                 <Item.Content verticalAlign='bottom'>
                   <Header as='h1'>{profile.displayName}</Header>
                   <br />
                   <Header as='h3'>
-                    {profile.occupation || 'No occupation'}
+                    {profile.occupation || 'No occupation listed'}
                   </Header>
                   <br />
                   <Header as='h3'>
-                    {this.getAge(profile.dateOfBirth)}, Lives in {profile.city}
+                    {this.getAge(profile.dateOfBirth)}, Lives in{' '}
+                    {profile.city || 'unspecified location'}
                   </Header>
                 </Item.Content>
               </Item>
@@ -84,18 +122,19 @@ class ProfileView extends Component {
               <Grid.Column width={10}>
                 <Header icon='smile' content={`About ${profile.displayName}`} />
                 <p>
-                  I am a: <strong>{profile.occupation}</strong>
+                  I am a:{' '}
+                  <strong>
+                    {profile.occupation || 'No occupation listed'}
+                  </strong>
                 </p>
                 <p>
-                  Originally from <strong>{profile.origin}</strong>
+                  Originally from <strong>{profile.origin || 'Unknown'}</strong>
                 </p>
                 <p>
                   Member Since:{' '}
                   <strong>
-                    {format(
-                      profile.createdAt && profile.createdAt.toDate(),
-                      'MM/YYYY'
-                    )}
+                    {profile.createdAt &&
+                      format(new Date(profile.createdAt.toDate()), 'MM/YYYY')}
                   </strong>
                 </p>
                 <p>{profile.description || 'No description'}</p>
@@ -152,35 +191,34 @@ class ProfileView extends Component {
         </Grid.Column>
 
         <Grid.Column width={12}>
-          <Segment attached>
+          <Segment attached loading={eventsLoading}>
             <Header icon='calendar' content='Events' />
-            <Menu secondary pointing>
-              <Menu.Item name='All Events' active />
-              <Menu.Item name='Past Events' />
-              <Menu.Item name='Future Events' />
-              <Menu.Item name='Events Hosted' />
-            </Menu>
+            <Tab onTabChange={(e, data) => this.changeTab(e, data)} panes={panes} menu={{ secondary: true, pointing: true }} />
+            <br/>
 
             <Card.Group itemsPerRow={5}>
-              <Card>
-                <Image src={'/assets/categoryImages/drinks.jpg'} />
-                <Card.Content>
-                  <Card.Header textAlign='center'>Event Title</Card.Header>
-                  <Card.Meta textAlign='center'>
-                    28th March 2018 at 10:00 PM
-                  </Card.Meta>
-                </Card.Content>
-              </Card>
-
-              <Card>
-                <Image src={'/assets/categoryImages/drinks.jpg'} />
-                <Card.Content>
-                  <Card.Header textAlign='center'>Event Title</Card.Header>
-                  <Card.Meta textAlign='center'>
-                    28th March 2018 at 10:00 PM
-                  </Card.Meta>
-                </Card.Content>
-              </Card>
+              {events &&
+                events.map(event => (
+                  <Card as={Link} to={`/events/${event.id}`} key={event.id}>
+                    <Image
+                      src={`/assets/categoryImages/${event.category}.jpg`}
+                    />
+                    <Card.Content>
+                      <Card.Header textAlign='center'>
+                        {event.title}
+                      </Card.Header>
+                      <Card.Meta textAlign='center'>
+                        <div>
+                          {event.date &&
+                            format(event.date.toDate(), 'dddd Do MMMM')}
+                        </div>
+                        <div>
+                          {event.date && format(event.date.toDate(), 'h:mm A')}
+                        </div>
+                      </Card.Meta>
+                    </Card.Content>
+                  </Card>
+                ))}
             </Card.Group>
           </Segment>
         </Grid.Column>
@@ -190,6 +228,9 @@ class ProfileView extends Component {
 }
 
 export default compose(
-  connect(mapStateToProps),
+  connect(
+    mapStateToProps,
+    actions
+  ),
   firestoreConnect((auth, userUID) => userProfileQuery(auth, userUID))
 )(ProfileView);

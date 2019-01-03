@@ -5,6 +5,8 @@ import {
   asyncActionComplete,
   asyncActionError
 } from './asyncActions';
+import firebase from '../config/firebase';
+import { FETCH_EVENTS } from '../constants';
 
 export const updateProfile = user => {
   return async (dispatch, getState, { getFirebase }) => {
@@ -138,10 +140,10 @@ export const setUserGoing = event => {
       });
       toastr.success('Success!', 'Successfully joined the event.');
     } catch (error) {
-        console.log(error);
-        toastr.error('Oops!', 'There was a problem signing up for the event');
+      console.error(error);
+      toastr.error('Oops!', 'There was a problem signing up for the event');
     }
-  }
+  };
 };
 
 export const setUserNotGoing = event => {
@@ -156,8 +158,62 @@ export const setUserNotGoing = event => {
       await firestore.delete(`event_attendee/${event.id}_${user.uid}`);
       toastr.success('Success!', 'Successfully removed from the event.');
     } catch (error) {
-        console.log(error);
-        toastr.error('Oops!', 'There was a problem cancelling your reservation.');
+      console.log(error);
+      toastr.error('Oops!', 'There was a problem cancelling your reservation.');
     }
-  }
-}
+  };
+};
+
+export const getUserEvents = (userUID, activeTab) => {
+  return async (dispatch, getState) => {
+    dispatch(asyncActionBegin());
+
+    const db = firebase.firestore();
+    const today = new Date(Date.now());
+    const eventsRef = db.collection('event_attendee');
+    let query;
+
+    // query attendee list for relevant docs
+    switch (activeTab) {
+      case 1: // past
+        query = eventsRef
+          .where('userUid', '==', userUID)
+          .where('eventDate', '<=', today)
+          .orderBy('eventDate', 'desc');
+        break;
+      case 2: // future
+        query = eventsRef
+          .where('userUid', '==', userUID)
+          .where('eventDate', '>=', today)
+          .orderBy('eventDate');
+        break;
+      case 3: // hosting
+        query = eventsRef
+          .where('userUid', '==', userUID)
+          .where('host', '==', true)
+          .orderBy('eventDate', 'desc');
+        break;
+      default:
+        query = eventsRef
+          .where('userUid', '==', userUID)
+          .orderBy('eventDate', 'desc');
+    }
+
+    try {
+      let querySnapshot = await query.get();
+      let events = []
+
+      for (let doc of querySnapshot.docs) {
+        // Get the events that match the ID of the attendee query
+        let event = await db.collection('events').doc(doc.data().eventId).get();
+        events.push({...event.data(), id: event.id});
+      }
+      dispatch({ type: FETCH_EVENTS, payload: { events } })
+      dispatch(asyncActionComplete());
+      return events;
+    } catch (error) {
+      console.error(error);
+      dispatch(asyncActionError());
+    }
+  };
+};

@@ -38,8 +38,8 @@ const EventDetailHeader = ({ event, isHost, isGoing, setUserGoing, setUserNotGoi
                     style={{ color: 'white' }}
                   />
                   <p>
-                    {format(event.date, 'dddd Do MMMM')} at{' '}
-                    {format(event.date, 'h:mm a')}
+                    {event.date && format(event.date.toDate(), 'dddd Do MMMM')} at{' '}
+                    {event.date && format(event.date.toDate(), 'h:mm a')}
                   </p>
                   <p>
                     Hosted by <strong>{event.hostedBy}</strong>

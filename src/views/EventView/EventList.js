@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
 
 import EventListItem from './EventListItem';
 
@@ -8,7 +9,6 @@ class EventList extends Component {
       return (
         <EventListItem
           key={event.id}
-          onDeleteEvent={this.props.onDeleteEvent}
           event={event}
         />
       );
@@ -16,14 +16,22 @@ class EventList extends Component {
   };
 
   render() {
-    const { events } = this.props;
+    const { events, moreEvents, loading, getMoreEvents } = this.props;
     return (
       <div>
-        {/* <h1>Events</h1> */}
-        {events && events.length ? (
-          this.renderEvents()
-        ) : (
-          <p style={{ fontStyle: 'italic' }}>No Events yet</p>
+        {events && events.length && (
+          <InfiniteScroll
+            pageStart={0}
+            loadMore={getMoreEvents}
+            hasMore={!loading && moreEvents}
+            initialLoad={false}
+          >
+            {events && events.length ? (
+              this.renderEvents()
+            ) : (
+              <p style={{ fontStyle: 'italic' }}>No Events yet</p>
+            )}
+          </InfiniteScroll>
         )}
       </div>
     );
