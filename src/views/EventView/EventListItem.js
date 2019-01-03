@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Icon, Item, Segment, List } from 'semantic-ui-react';
+import { Button, Icon, Item, Segment, List, Label } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 
@@ -15,7 +15,8 @@ class EventListItem extends Component {
       title,
       hostedBy,
       hostPhotoURL,
-      venue
+      venue,
+      cancelled
     } = this.props.event;
     return (
       <Segment.Group>
@@ -28,19 +29,28 @@ class EventListItem extends Component {
                 <Item.Description>
                   Hosted by <a>{hostedBy}</a>
                 </Item.Description>
+                {cancelled && (
+                  <Label
+                    style={{ top: '-40px' }}
+                    ribbon='right'
+                    color='red'
+                    content='Cancelled'
+                  />
+                )}
               </Item.Content>
             </Item>
           </Item.Group>
         </Segment>
         <Segment>
           <span>
-            <Icon name='clock' /> {format(date.toDate(), 'dddd Do MMMM')} at{' '} {format(date.toDate(), 'h:mm a')} |
+            <Icon name='clock' /> {format(date, 'dddd Do MMMM')} at{' '}
+            {format(date, 'h:mm a')} |
             <Icon name='marker' /> {venue}
           </span>
         </Segment>
         <Segment secondary>
           <List horizontal>
-            {attendees 
+            {attendees
               ? Object.values(attendees).map((att, index) => {
                   return <EventListAttendee key={index} attendee={att} />;
                 })

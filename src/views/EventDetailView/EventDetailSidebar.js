@@ -1,12 +1,12 @@
 import React from 'react';
 import { Item, Label, List, Segment } from 'semantic-ui-react';
 
-const displayAttendees = attendees =>
-  attendees && attendees.map(attendee => (
+const displayAttendees = (attendees, event) =>
+  attendees && attendees.map((attendee, i) => (
     <Segment attached>
       <List relaxed divided>
-        <Item key={attendee.id} style={{ position: 'relative' }}>
-          {attendee.name === attendees.hostedBy && (
+        <Item key={i} style={{ position: 'relative' }}>
+          {attendee.displayName === event.hostedBy && (
             <Label
               style={{ position: 'absolute' }}
               color='orange'
@@ -18,7 +18,7 @@ const displayAttendees = attendees =>
           <Item.Image size='tiny' src={attendee.photoURL} />
           <Item.Content verticalAlign='middle'>
             <Item.Header as='h3'>
-              <a>{attendee.name}</a>
+              <a>{attendee.displayName}</a>
             </Item.Header>
           </Item.Content>
         </Item>
@@ -36,7 +36,7 @@ const displayAttendees = attendees =>
     }
   }
 
-const EventDetailSidebar = ({ attendees }) => {
+const EventDetailSidebar = ({ attendees, event }) => {
   return (
     <div>
       <Segment
@@ -47,9 +47,9 @@ const EventDetailSidebar = ({ attendees }) => {
         inverted
         color='teal'
       >
-        { displayNumAttending(attendees) }
+        {displayNumAttending(attendees)}
       </Segment>
-      {displayAttendees(attendees)}
+      {displayAttendees(attendees, event)}
     </div>
   );
 };

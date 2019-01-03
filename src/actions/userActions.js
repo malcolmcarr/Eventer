@@ -112,3 +112,60 @@ export const setProfilePicture = image => {
     }
   };
 };
+
+export const setUserGoing = event => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    const user = firestore.auth().currentUser;
+    const photoURL = getState().firebase.profile.photoURL;
+    const newAttendee = {
+      going: true,
+      joinDate: Date.now(),
+      photoURL,
+      displayName: user.displayName,
+      host: false
+    };
+
+    try {
+      await firestore.update(`events/${event.id}`, {
+        [`attendees.${user.uid}`]: newAttendee
+      });
+      await firestore.set(`event_attendee/${event.id}_${user.uid}`, {
+        eventId: event.id,
+        userUID: user.uid,
+        eventDate: event.date,
+        host: false
+      });
+      toastr.success('Success!', 'Successfully joined the event.');
+    } catch (error) {
+        console.log(error);
+        toastr.error('Oops!', 'There was a problem signing up for the event');
+    }
+  }
+};
+
+export const setUserNotGoing = event => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    const user = firestore.auth().currentUser;
+    const photoURL = getState().firebase.profile.photoURL;
+    const attendee = {
+      going: false,
+      joinDate: Date.now(),
+      photoURL,
+      displayName: user.displayName,
+      host: false
+    };
+
+    try {
+      await firestore.update(`events/${event.id}`, {
+        [`attendees.${user.uid}`]: firestore.FieldValue.delete()
+      });
+      await firestore.delete(`event_attendee/${event.id}_${user.uid}`);
+      toastr.success('Success!', 'Successfully removed from the event.');
+    } catch (error) {
+        console.log(error);
+        toastr.error('Oops!', 'There was a problem cancelling your reservation.');
+    }
+  }
+}

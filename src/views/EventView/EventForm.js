@@ -3,21 +3,26 @@ import React, { Component } from 'react';
 import { Button, Grid, Header, Form, Segment } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { reduxForm, Field } from 'redux-form';
-import cuid from 'cuid';
 import { combineValidators, isRequired } from 'revalidate';
 import Script from 'react-load-script';
 
-import { createEvent, updateEvent } from '../../actions/eventActions';
+import {
+  createEvent,
+  updateEvent,
+  cancelToggleEvent
+} from '../../actions/eventActions';
 import TextInput from '../../components/form/TextInput';
 import TextArea from '../../components/form/TextArea';
 import SelectInput from '../../components/form/SelectInput';
 import DateInput from '../../components/form/DateInput';
 import PlaceInput from '../../components/form/PlaceInput';
 import keys from '../../credentials/keys';
+import { withFirestore } from 'react-redux-firebase';
 
 const actions = {
   createEvent,
-  updateEvent
+  updateEvent,
+  cancelToggleEvent
 };
 
 const categories = [
@@ -36,18 +41,14 @@ const validate = combineValidators({
   venue: isRequired({ message: 'Please enter a venue.' })
 });
 
-const mapStateToProps = (state, ownProps) => {
-  const eventId = ownProps.match ? ownProps.match.params.id : undefined;
+const mapStateToProps = state => {
+  if (state.firestore.ordered.events && state.firestore.ordered.events[0])
+    return {
+      initialValues: state.firestore.ordered.events[0],
+      event: state.firestore.ordered.events[0]
+    };
 
-  let defaultEvent = {};
-
-  if (eventId && state.events.length) {
-    for (let event of state.events) {
-      if (event.id === eventId) return { initialValues: event };
-    }
-  }
-
-  return { initialValues: defaultEvent };
+  return { initialValues: {} };
 };
 
 class EventForm extends Component {
@@ -56,6 +57,16 @@ class EventForm extends Component {
     venueLocation: null,
     scriptLoaded: false
   };
+
+  async componentDidMount() {
+    const { firestore, match } = this.props;
+    await firestore.setListener(`events/${match.params.id}`);
+  }
+
+  async componentWillUnmount() {
+    const { firestore, match } = this.props;
+    await firestore.unsetListener(`events/${match.params.id}`);
+  }
 
   onCitySelect = suggestion => {
     if (suggestion) {
@@ -68,28 +79,22 @@ class EventForm extends Component {
   onVenueSelect = suggestion => {
     if (suggestion) {
       // Fix to make sure selected value is updated in store
-      this.props.change('venue', suggestion.description); 
+      this.props.change('venue', suggestion.description);
       suggestion && this.setState({ venueLocation: suggestion.location });
     }
   };
 
   onFormSubmit = values => {
-    // Convert object to string for for React, if provided
-    if (values.date) values.date = values.date.toString();
     values.venueLocation = this.state.venueLocation;
-    const { initialValues } = this.props;
+    const { initialValues, event } = this.props;
     // Check if an event is being updated or newly created
     if (initialValues.id) {
+      if (Object.keys(values.venueLocation).length === 0)
+        values.venueLocation = event.venueLocation;
       this.props.updateEvent(values);
       this.props.history.goBack();
     } else {
-      const newEvent = {
-        ...values,
-        id: cuid(),
-        hostPhotoURL: '/assets/user.png',
-        hostedBy: 'Charlie'
-      };
-      this.props.createEvent(newEvent);
+      this.props.createEvent(values);
       this.props.history.push('/events');
     }
   };
@@ -99,7 +104,15 @@ class EventForm extends Component {
   };
 
   render() {
-    const { invalid, submitting, pristine } = this.props;
+    const {
+      invalid,
+      submitting,
+      pristine,
+      event,
+      match,
+      history,
+      cancelToggleEvent
+    } = this.props;
     const { cityLocation } = this.state;
     return (
       <Grid>
@@ -176,14 +189,23 @@ class EventForm extends Component {
               <Button
                 // Send location based on whether updating or creating
                 onClick={
-                  this.props.match.params.id
-                    ? this.props.history.goBack
-                    : () => this.props.history.push('/events')
+                  match.params.id
+                    ? history.goBack
+                    : () => history.push('/events')
                 }
                 type='button'
               >
                 Cancel
               </Button>
+              <Button
+                onClick={() =>
+                  cancelToggleEvent(!event.cancelled, match.params.id)
+                }
+                type='button'
+                color={event.cancelled ? 'green' : 'red'}
+                floated='right'
+                content={event.cancelled ? 'Reactivate Event' : 'Cancel Event'}
+              />
             </Form>
           </Segment>
         </Grid.Column>
@@ -192,11 +214,13 @@ class EventForm extends Component {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  actions
-)(
-  reduxForm({ form: 'eventForm', enableReinitialize: true, validate })(
-    EventForm
+export default withFirestore(
+  connect(
+    mapStateToProps,
+    actions
+  )(
+    reduxForm({ form: 'eventForm', enableReinitialize: true, validate })(
+      EventForm
+    )
   )
 );
