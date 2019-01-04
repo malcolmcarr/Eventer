@@ -1,6 +1,8 @@
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/app'
+import 'firebase/auth'
+import 'firebase/firestore'
 import keys from '../credentials/keys';
-import 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: keys.fireBaseAPIKey,

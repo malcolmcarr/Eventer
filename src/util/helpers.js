@@ -8,7 +8,6 @@ export const arraysAreEqual = (arr1, arr2) => {
   const arr1Ids = arr1.map(a => a.id);
   const arr2Ids = arr2.map(b => b.id);
 
-  console.log(arr1Ids.every(id => arr2Ids.includes(id)));
   return arr1Ids.every(id => arr2Ids.includes(id));
 };
 

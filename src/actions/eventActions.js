@@ -81,12 +81,10 @@ export const getEventsForDashboard = lastEvent => {
 
       lastEvent
         ? (query = eventsRef
-            .where('date', '>=', today)
             .orderBy('date')
             .startAfter(startAfter)
             .limit(2))
         : (query = eventsRef
-            .where('date', '>=', today)
             .orderBy('date')
             .limit(2));
 
